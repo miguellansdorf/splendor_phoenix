@@ -48,11 +48,18 @@ defmodule Splendor.AccountsTest do
     end
   end
 
+  describe "change_user_registration" do
+    test "returns a user changeset" do
+      assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
+      assert changeset.required == [:username, :email]
+    end
+  end
+
   describe "register_user/1" do
-    test "requires email to be set" do
+    test "requires email and username to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
-      assert %{email: ["can't be blank"]} = errors_on(changeset)
+      assert %{email: ["can't be blank"], username: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "validates email when given" do
@@ -77,9 +84,29 @@ defmodule Splendor.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
+    test "trims leading and trailing whitespace from username" do
+      {:ok, user} =
+        Accounts.register_user(valid_user_attributes(%{username: "   Hello World   "}))
+
+      assert user.username == "Hello World"
+    end
+
+    test "validates minimum values for username for security" do
+      {:error, changeset} = Accounts.register_user(%{username: "Hi"})
+
+      assert %{username: ["should be at least 4 character(s)"]} = errors_on(changeset)
+    end
+
+    test "validates maximum values for username for security" do
+      {:error, changeset} =
+        Accounts.register_user(%{username: String.duplicate("Hello World", 3)})
+
+      assert %{username: ["should be at most 30 character(s)"]} = errors_on(changeset)
+    end
+
     test "registers users without password" do
       email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      {:ok, user} = Accounts.register_user(valid_user_attributes(%{email: email}))
       assert user.email == email
       assert is_nil(user.hashed_password)
       assert is_nil(user.confirmed_at)
@@ -191,13 +218,13 @@ defmodule Splendor.AccountsTest do
         Accounts.change_user_password(
           %User{},
           %{
-            "password" => "new valid password"
+            "password" => "New valid password!"
           },
           hash_password: false
         )
 
       assert changeset.valid?
-      assert get_change(changeset, :password) == "new valid password"
+      assert get_change(changeset, :password) == "New valid password!"
       assert is_nil(get_change(changeset, :hashed_password))
     end
   end
@@ -215,7 +242,11 @@ defmodule Splendor.AccountsTest do
         })
 
       assert %{
-               password: ["should be at least 12 character(s)"],
+               password: [
+                 "at least one digit or punctuation character",
+                 "at least one upper case character",
+                 "should be at least 12 character(s)"
+               ],
                password_confirmation: ["does not match password"]
              } = errors_on(changeset)
     end
@@ -232,12 +263,12 @@ defmodule Splendor.AccountsTest do
     test "updates the password", %{user: user} do
       {:ok, {user, expired_tokens}} =
         Accounts.update_user_password(user, %{
-          password: "new valid password"
+          password: "New valid password!"
         })
 
       assert expired_tokens == []
       assert is_nil(user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_email_and_password(user.email, "New valid password!")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
@@ -245,7 +276,7 @@ defmodule Splendor.AccountsTest do
 
       {:ok, {_, _}} =
         Accounts.update_user_password(user, %{
-          password: "new valid password"
+          password: "New valid password!"
         })
 
       refute Repo.get_by(UserToken, user_id: user.id)

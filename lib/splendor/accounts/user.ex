@@ -6,6 +6,7 @@ defmodule Splendor.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
@@ -15,7 +16,23 @@ defmodule Splendor.Accounts.User do
   end
 
   @doc """
-  A user changeset for registering or changing the email.
+  A user changeset for registering.
+
+  ## Options
+
+    * `:validate_unique` - Set to false if you don't want to validate the
+      uniqueness of the email, useful when displaying live validations.
+      Defaults to `true`.
+  """
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :username])
+    |> validate_email(opts)
+    |> validate_username(opts)
+  end
+
+  @doc """
+  A user changeset for changing the email.
 
   It requires the email to change otherwise an error is added.
 
@@ -58,6 +75,22 @@ defmodule Splendor.Accounts.User do
     end
   end
 
+  defp validate_username(changeset, opts) do
+    changeset =
+      changeset
+      |> validate_required([:username])
+      |> update_change(:username, &String.trim/1)
+      |> validate_length(:username, min: 4, max: 30)
+
+    if Keyword.get(opts, :validate_unique, true) do
+      changeset
+      |> unsafe_validate_unique(:username, Splendor.Repo)
+      |> unique_constraint(:username)
+    else
+      changeset
+    end
+  end
+
   @doc """
   A user changeset for changing the password.
 
@@ -85,9 +118,11 @@ defmodule Splendor.Accounts.User do
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72)
     # Examples of additional password validation:
-    # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
+    |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
+      message: "at least one digit or punctuation character"
+    )
     |> maybe_hash_password(opts)
   end
 
