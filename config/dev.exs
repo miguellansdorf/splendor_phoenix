@@ -24,10 +24,8 @@ config :splendor, SplendorWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "S6T88QG4CZSTWcHX2R52CM11Z88NEsAlw6H8s6qA46J8qHbLaO09InwNWKjS0xCz",
-  watchers: [
-    esbuild: {Esbuild, :install_and_run, [:splendor, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:splendor, ~w(--watch)]}
-  ]
+  watchers: [vite: {Bun, :install_and_run, [:vite, ~w(dev)]}],
+  static_url: [host: "localhost", port: 5173]
 
 # ## SSL Support
 #
