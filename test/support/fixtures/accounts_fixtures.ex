@@ -10,11 +10,22 @@ defmodule Splendor.AccountsFixtures do
   alias Splendor.Accounts.Scope
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
+
+  def extract_user_username(email) do
+    at_index = String.split(email, "", trim: true) |> Enum.find_index(fn l -> l == "@" end)
+
+    String.slice(email, Range.new(0, at_index - 1))
+  end
+
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
+    email = Map.get(attrs, :email, unique_user_email())
+    username = Map.get(attrs, :username, extract_user_username(email))
+
     Enum.into(attrs, %{
-      email: unique_user_email()
+      email: email,
+      username: username
     })
   end
 

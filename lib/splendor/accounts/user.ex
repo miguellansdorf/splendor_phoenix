@@ -6,12 +6,30 @@ defmodule Splendor.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 
     timestamps(type: :utc_datetime)
+  end
+
+  @doc """
+  A user changeset for registration.
+
+  ## Options
+
+    * `:validate_unique` - Set to false if you don't want to validate the
+      uniqueness of the email and username, useful when displaying live validations.
+      Defaults to `true`.
+  """
+
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :username])
+    |> validate_email(opts)
+    |> validate_username(opts)
   end
 
   @doc """
@@ -53,6 +71,22 @@ defmodule Splendor.Accounts.User do
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
       add_error(changeset, :email, "did not change")
+    else
+      changeset
+    end
+  end
+
+  defp validate_username(changeset, opts) do
+    changeset =
+      changeset
+      |> validate_required([:username])
+      |> validate_format(:username, ~r/^([^\s]+([\s]?[^\s]+)?)+$/)
+      |> validate_length(:username, min: 4, max: 30)
+
+    if Keyword.get(opts, :validate_unique, true) do
+      changeset
+      |> unsafe_validate_unique(:username, Splendor.Repo)
+      |> unique_constraint(:username)
     else
       changeset
     end

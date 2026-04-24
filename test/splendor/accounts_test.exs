@@ -49,10 +49,10 @@ defmodule Splendor.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email to be set" do
+    test "requires email and username to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
-      assert %{email: ["can't be blank"]} = errors_on(changeset)
+      assert %{email: ["can't be blank"], username: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "validates email when given" do
@@ -77,9 +77,32 @@ defmodule Splendor.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
+    test "validates username when given" do
+      {:error, changeset} = Accounts.register_user(%{username: "a  "})
+
+      assert %{username: ["should be at least 4 character(s)", "has invalid format"]} =
+               errors_on(changeset)
+    end
+
+    test "validates maximum values for username for security" do
+      too_long = String.duplicate("db", 100)
+      {:error, changeset} = Accounts.register_user(%{username: too_long})
+      assert "should be at most 30 character(s)" in errors_on(changeset).username
+    end
+
+    test "validates username uniqueness" do
+      %{username: username} = user_fixture()
+      {:error, changeset} = Accounts.register_user(%{username: username})
+      assert "has already been taken" in errors_on(changeset).username
+
+      # Now try with the upper cased username too, to check that username case is ignored.
+      {:error, changeset} = Accounts.register_user(%{username: String.upcase(username)})
+      assert "has already been taken" in errors_on(changeset).username
+    end
+
     test "registers users without password" do
       email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      {:ok, user} = Accounts.register_user(valid_user_attributes(%{email: email}))
       assert user.email == email
       assert is_nil(user.hashed_password)
       assert is_nil(user.confirmed_at)
@@ -103,6 +126,13 @@ defmodule Splendor.AccountsTest do
 
       # not authenticated
       refute Accounts.sudo_mode?(%User{})
+    end
+  end
+
+  describe "change_user_registration/3" do
+    test "returns a user changeset" do
+      assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
+      assert changeset.required == [:username, :email]
     end
   end
 
