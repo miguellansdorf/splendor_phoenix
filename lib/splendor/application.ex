@@ -14,6 +14,8 @@ defmodule Splendor.Application do
       {Phoenix.PubSub, name: Splendor.PubSub},
       # Start a worker by calling: Splendor.Worker.start_link(arg)
       # {Splendor.Worker, arg},
+      Splendor.Game.Manager,
+      {Registry, keys: :unique, name: Splendor.GameRegistry},
       # Start to serve requests, typically the last entry
       SplendorWeb.Endpoint
     ]
