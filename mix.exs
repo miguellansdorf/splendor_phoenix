@@ -40,6 +40,7 @@ defmodule Splendor.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:typed_struct, "~> 0.3.0"},
       {:igniter, "~> 0.6", only: [:dev, :test]},
       {:argon2_elixir, "~> 4.0"},
       {:phoenix, "~> 1.8.3"},
