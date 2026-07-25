@@ -433,7 +433,9 @@ defmodule Splendor.Game.Developments do
         _ -> @developments_3
       end
 
-    Enum.split(developments, 4)
+    developments
+    |> Enum.shuffle()
+    |> Enum.split(4)
   end
 
   def update_group({cards, deck}, index)
