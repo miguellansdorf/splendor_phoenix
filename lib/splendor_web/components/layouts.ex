@@ -37,33 +37,41 @@ defmodule SplendorWeb.Layouts do
     ~H"""
     <header class="navbar px-4 sm:px-6 lg:px-8">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={static_url(SplendorWeb.Endpoint, ~p"/images/logo.svg")} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
+        <.link href={~p"/"} class="flex-1 flex w-fit items-center gap-2 text-primary">
+          <.icon name="hero-rectangle-group" class="size-6" />
+          <span class="text-md font-semibold">Splendor</span>
+        </.link>
       </div>
       <div class="flex-none">
         <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
+          <%= if @current_scope do %>
+            <li class="dropdown">
+              <div tabindex="0" role="button" class="btn m-1">{@current_scope.user.username}</div>
+              <ul
+                tabindex="-1"
+                class="dropdown-content menu bg-base-100 rounded-box z-1  p-2 shadow-sm"
+              >
+                <li><.link navigate={~p"/users/settings"}>Settings</.link></li>
+                <li><.link href={~p"/users/log-out"} method="delete">Logout</.link></li>
+              </ul>
+            </li>
+          <% else %>
+            <li>
+              <.link navigate={~p"/users/log-in"} class="btn btn-primary">Login</.link>
+            </li>
+            <li>
+              <.link navigate={~p"/users/register"} class="btn">Register</.link>
+            </li>
+          <% end %>
           <li>
             <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
           </li>
         </ul>
       </div>
     </header>
 
     <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
+      <div class="mx-auto space-y-4">
         {render_slot(@inner_block)}
       </div>
     </main>
