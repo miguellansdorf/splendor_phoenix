@@ -31,7 +31,9 @@ defmodule SplendorWeb.GameComponents do
             attribute_bg(attribute)
           ]}
         >
-          {Map.get(@player.coins, attribute, 0)}
+          {Enum.count(@player.developments, fn %Development{} = development ->
+            development.attribute == attribute
+          end)}
         </div>
       </div>
       <div class="flex gap-1 items-center">
