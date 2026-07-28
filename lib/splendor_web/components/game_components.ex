@@ -52,7 +52,7 @@ defmodule SplendorWeb.GameComponents do
 
   def noble(assigns) do
     ~H"""
-    <div class="size-32 border-2 border-amber-800 rounded-lg overflow-hidden flex flex-col-reverse items-center relative select-none">
+    <div class="size-32 border-2 border-amber-800 rounded-lg overflow-hidden flex flex-col-reverse items-center relative select-none group-hover:border-amber-500 group-hover:cursor-pointer">
       <img
         src={@noble.image}
         class="absolute bg-cover -z-1"
@@ -95,7 +95,8 @@ defmodule SplendorWeb.GameComponents do
           "absolute w-32 h-36 rounded-lg flex flex-col justify-center items-center border-4 border-amber-800",
           @level == 1 && "bg-gray-700",
           @level == 2 && "bg-gray-800",
-          @level == 3 && "bg-gray-900"
+          @level == 3 && "bg-gray-900",
+          i == @count && "group-hover:border-amber-500 group-hover:cursor-pointer"
         ]}
       >
         <SplendorWeb.CoreComponents.icon name="hero-rectangle-group" class="size-6 text-primary" />
@@ -121,7 +122,7 @@ defmodule SplendorWeb.GameComponents do
   def development(assigns) do
     ~H"""
     <div class={[
-      "w-32 h-36 rounded-lg overflow-hidden flex flex-col justify-between select-none relative border-2 border-amber-800"
+      "w-32 h-36 rounded-lg overflow-hidden flex flex-col justify-between select-none relative border-2 border-amber-800 group-hover:border-amber-500 group-hover:cursor-pointer"
     ]}>
       <img
         src={"/images/developments/#{@development.attribute}.png"}
@@ -165,7 +166,8 @@ defmodule SplendorWeb.GameComponents do
         style={"transform: translate(#{(i - 1) * -0.45}rem, #{(i - 1) * 0.55}rem);"}
         class={[
           "absolute size-20 rounded-full border-4 flex justify-center items-center bg-gray-900",
-          attribute_border(@attribute)
+          attribute_border(@attribute),
+          i == @count && "group-hover:border-amber-500 group-hover:cursor-pointer"
         ]}
       >
         <div class={["size-14 rounded-full", attribute_bg(@attribute)]}></div>
