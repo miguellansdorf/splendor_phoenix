@@ -8,7 +8,7 @@ defmodule SplendorWeb.GameComponents do
   def player(assigns) do
     ~H"""
     <div class="p-1 flex flex-col gap-1 rounded-lg border-2 items-center select-none">
-      <span class="text-lg xl:text-2xl">{@player.username}</span>
+      <span class="text-lg xl:text-3xl">{@player.username}</span>
       <span class="text-sm xl:text-xl border xl:border-2 rounded-full size-6 xl:size-8 flex items-center justify-center font-bold">
         {@player.points}
       </span>
@@ -56,7 +56,7 @@ defmodule SplendorWeb.GameComponents do
 
   def noble(assigns) do
     ~H"""
-    <div class="size-32 xl:size-54 border-2 xl:border-6 border-amber-800 rounded-lg overflow-hidden flex flex-col-reverse items-center relative select-none group-hover:border-amber-500 group-hover:cursor-pointer">
+    <div class="size-32 xl:size-44 border-2 xl:border-4 border-amber-800 rounded-lg overflow-hidden flex flex-col-reverse items-center relative select-none group-hover:border-amber-500 group-hover:cursor-pointer">
       <img
         src={@noble.image}
         class="absolute bg-cover -z-1"
@@ -69,7 +69,7 @@ defmodule SplendorWeb.GameComponents do
           class="flex flex-col items-center"
         >
           <div class={[
-            "w-4 h-6 xl:w-8 xl:h-10 rounded-sm flex items-center justify-center",
+            "w-4 h-6 xl:w-6 xl:h-8 rounded-sm flex items-center justify-center",
             attribute_bg(attribute)
           ]}>
           </div>
@@ -87,11 +87,11 @@ defmodule SplendorWeb.GameComponents do
 
   def deck(assigns) do
     ~H"""
-    <div class="relative w-32 h-36 xl:w-54 xl:h-60 rounded-lg flex flex-col justify-center items-center select-none border-4 xl:border-6 border-amber-800">
+    <div class="relative w-32 h-36 xl:w-44 xl:h-48 rounded-lg flex flex-col justify-center items-center select-none border-2 xl:border-4 border-amber-800">
       <div class="absolute w-full h-full flex flex-col justify-center items-center">
         <SplendorWeb.CoreComponents.icon
           name="hero-rectangle-group"
-          class="size-6 xl:size-10 text-amber-800"
+          class="size-6 xl:size-8 text-amber-800"
         />
         <div class="flex gap-1 items-center">
           <span :for={_ <- Range.new(1, @level, 1)} class="bg-amber-800 size-2 rounded-full"></span>
@@ -101,7 +101,7 @@ defmodule SplendorWeb.GameComponents do
         :for={i <- Range.new(1, @count, 1)}
         style={"transform: translateX(#{(i - 1) * -0.125}rem)"}
         class={[
-          "absolute w-32 h-36 xl:w-54 xl:h-60 rounded-lg flex flex-col justify-center items-center border-4 xl:border-6 border-amber-800",
+          "absolute w-32 h-36 xl:w-44 xl:h-48 rounded-lg flex flex-col justify-center items-center border-2 xl:border-4 border-amber-800",
           @level == 1 && "bg-gray-700",
           @level == 2 && "bg-gray-800",
           @level == 3 && "bg-gray-900",
@@ -110,7 +110,7 @@ defmodule SplendorWeb.GameComponents do
       >
         <SplendorWeb.CoreComponents.icon
           name="hero-rectangle-group"
-          class="size-6 xl:size-10 text-primary"
+          class="size-6 xl:size-8 text-primary"
         />
         <div class="flex gap-1 items-center">
           <span :for={_ <- Range.new(1, @level, 1)} class="bg-primary size-2 rounded-full"></span>
@@ -125,10 +125,10 @@ defmodule SplendorWeb.GameComponents do
 
   def development(%{development: nil} = assigns) do
     ~H"""
-    <div class="w-32 h-36 xl:w-54 xl:h-60 rounded-lg flex flex-col justify-center items-center select-none border-2 xl:border-6 border-amber-800">
+    <div class="w-32 h-36 xl:w-44 xl:h-48 rounded-lg flex flex-col justify-center items-center select-none border-2 xl:border-4 border-amber-800">
       <SplendorWeb.CoreComponents.icon
         name="hero-rectangle-group"
-        class="size-6 xl:size-10 text-amber-800"
+        class="size-6 xl:size-8 text-amber-800"
       />
     </div>
     """
@@ -137,7 +137,7 @@ defmodule SplendorWeb.GameComponents do
   def development(assigns) do
     ~H"""
     <div class={[
-      "w-32 h-36 xl:w-54 xl:h-60 rounded-lg overflow-hidden flex flex-col justify-between select-none relative border-2 xl:border-6 border-amber-800 group-hover:border-amber-500 group-hover:cursor-pointer"
+      "w-32 h-36 xl:w-44 xl:h-48 rounded-lg overflow-hidden flex flex-col justify-between select-none relative border-2 xl:border-4 border-amber-800 group-hover:border-amber-500 group-hover:cursor-pointer"
     ]}>
       <img
         src={"/images/developments/#{@development.attribute}.png"}
@@ -145,21 +145,21 @@ defmodule SplendorWeb.GameComponents do
         class="-z-10 bg-cover absolute"
       />
       <div class="flex justify-between items-center p-2">
-        <div class={["size-6 xl:size-10 rounded-full", attribute_bg(@development.attribute)]}></div>
+        <div class={["size-6 xl:size-8 rounded-full", attribute_bg(@development.attribute)]}></div>
         <span class={[
-          "text-xl xl:text-4xl font-bold text-white",
+          "text-xl xl:text-3xl font-bold text-white",
           @development.points == 0 && "invisible"
         ]}>
           {@development.points}
         </span>
       </div>
-      <div class="flex flex-col p-2 xl:gap-2">
+      <div class="flex flex-col p-2 xl:gap-1">
         <div
           :for={attribute <- [:diamond, :ruby, :emerald, :saphire, :amethyst]}
           :if={Map.get(@development.cost, attribute, 0) > 0}
           class="flex gap-1 items-center"
         >
-          <div class={["size-3 xl:size-6 rounded-full", attribute_bg(attribute)]}></div>
+          <div class={["size-3 xl:size-5 rounded-full", attribute_bg(attribute)]}></div>
           <span class="text-sm xl:text-lg font-bold text-white">
             {Map.get(@development.cost, attribute)}
           </span>
@@ -178,19 +178,19 @@ defmodule SplendorWeb.GameComponents do
   def coins(assigns) do
     ~H"""
     <div class={[
-      "size-20 xl:size-36 rounded-full border-3 border-dashed relative flex justify-center items-center",
+      "size-20 xl:size-28 rounded-full border-3 border-dashed relative flex justify-center items-center",
       attribute_border(@attribute)
     ]}>
       <div
         :for={i <- Range.new(1, @count, 1)}
         style={"transform: translate(#{(i - 1) * -0.45}rem, #{(i - 1) * 0.55}rem);"}
         class={[
-          "absolute size-20 xl:size-36 rounded-full border-4 xl:border-6 flex justify-center items-center bg-gray-900",
+          "absolute size-20 xl:size-28 rounded-full border-4 xl:border-5 flex justify-center items-center bg-gray-900",
           attribute_border(@attribute),
           i == @count && "group-hover:border-amber-500 group-hover:cursor-pointer"
         ]}
       >
-        <div class={["size-14 xl:size-24 rounded-full", attribute_bg(@attribute)]}></div>
+        <div class={["size-14 xl:size-19 rounded-full", attribute_bg(@attribute)]}></div>
       </div>
     </div>
     """
